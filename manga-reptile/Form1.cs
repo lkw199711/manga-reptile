@@ -10,11 +10,16 @@ using System.Windows.Forms;
 
 namespace manga_reptile
 {
-    public partial class Form1 : Form
+    public partial class FormIndex : Form
     {
-        public Form1()
+        public FormIndex()
         {
             InitializeComponent();
+        }
+
+        private void FormIndex_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }
