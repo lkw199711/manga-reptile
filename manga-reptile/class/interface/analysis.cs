@@ -18,6 +18,13 @@ namespace manga_reptile
         List<string> get_chapter_pages(string html);
 
         /// <summary>
+        /// 获取漫画名称
+        /// </summary>
+        /// <param name="html">漫画主页的html数据</param>
+        /// <returns>漫画名称</returns>
+        string get_manga_name(string html);
+
+        /// <summary>
         /// 获取所有章节的链接
         /// </summary>
         /// <param name="html">当前漫画目录页的html代码</param>
@@ -50,13 +57,13 @@ namespace manga_reptile
         /// </summary>
         /// <param name="url">链接地址</param>
         /// <returns>html代码</returns>
-        string get_html_by_request(string url);
+        string get_html_by_request(string url, string cookie = "", string referer = "");
 
         /// <summary>
         /// 根据链接获取页面html代码-使用浏览器
         /// </summary>
         /// <param name="url">链接地址</param>
         /// <returns>html代码</returns>
-        string get_html_by_browser(string url);
+        string get_html_by_browser(string url, string cookie = "", string referer = "");
     }
 }

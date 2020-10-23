@@ -17,6 +17,8 @@ namespace manga_reptile
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new FormIndex());
+
+            global.downloadRoute = @"./download/";
         }
     }
 }

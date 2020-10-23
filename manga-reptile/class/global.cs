@@ -10,5 +10,6 @@ namespace manga_reptile
     class global
     {
         public static string website;
+        public static string downloadRoute;
     }
 }
