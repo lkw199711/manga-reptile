@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Security.Policy;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using lkw;
 
@@ -75,14 +77,21 @@ namespace manga_reptile
             {
                 //生成文件名
                 string fileName = route + i.ToString() + suffix;
+                //图片下载路径
+                string fileUrl = images[i];
                 //如果存在则跳出，不记录错误
                 if (File.Exists(fileName)) continue;
 
+                //输出错误信息（错误图片序号与链接）
+                lkw.WriteLine(route + "log.txt", "图片" + i + "下载错误 " + fileUrl);
+                //错误数量+1
+                error++;
+                //再次尝试下载
+                download_image_by_http(fileUrl, fileName);
             }
 
-
-
-            throw new NotImplementedException();
+            //返回错误数量
+            return error;
         }
 
         /// <summary>
@@ -92,17 +101,20 @@ namespace manga_reptile
         /// <returns>返回当前章节的图片数量</returns>
         private int download_chapter_images(ChapterItem chapter)
         {
+            //图片下载链接
             List<string> images = chapter.images;
-            string route = this.downloadRoute + chapter.name;
-
+            //下载路径
+            string route = this.downloadRoute + chapter.name+"\\";
+            //执行下载
             images.ForEach((string i) => {
-                http_download(i, route);
+                download_image_by_http(i, route);
             });
 
             //校验图片数量
             this.check_chapter_files(chapter, route);
 
-            throw new NotImplementedException();
+            //返回图片数量
+            return images.Count;
         }
 
         /// <summary>
@@ -226,8 +238,8 @@ namespace manga_reptile
         /// </summary>
         /// <param name="url">下载文件地址</param>
         /// <param name="path">文件存放地址，包含文件名</param>
-        /// <returns></returns>
-        private static bool http_download(string url, string path)
+        /// <returns>文件是否保存成功</returns>
+        private static bool download_image_by_http(string url, string path)
         {
             if (System.IO.File.Exists(path))
             {
@@ -272,6 +284,16 @@ namespace manga_reptile
                 return false;
             }
         }
+
+        /// <summary>
+        /// 获取图片后缀名
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        private static string get_image_suffix(string fileName)
+        {
+            return Regex.Match(fileName, "\\.(jpg|jpeg|png|bmp|gif|webp)", RegexOptions.IgnoreCase).Value;
+        }
     }
     /// <summary>
     /// 章节类
@@ -285,5 +307,13 @@ namespace manga_reptile
         public string url;
         public string suffix;
         public List<string> images;
+
+        ChapterItem(string name,string url,string suffix, List<string> images)
+        {
+            this.name = name;
+            this.url = url;
+            this.suffix = suffix;
+            this.images = images;
+        }
     }
 }

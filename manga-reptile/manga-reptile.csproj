@@ -46,7 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="class\analysis.cs" />
+    <Compile Include="class\derive\analysis.cs" />
     <Compile Include="class\global.cs" />
     <Compile Include="class\lkw.cs" />
     <Compile Include="form-index.cs">
