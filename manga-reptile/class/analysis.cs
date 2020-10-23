@@ -8,6 +8,21 @@ namespace manga_reptile
 {
     class analysis : IAnalysis
     {
+        //漫画名称
+        public static string name = "";
+        //漫画主页链接
+        public static string url = "";
+        //漫画网站标识
+        public static string webStieMark = "";
+        //章节合集
+        public List<ChapterItem> chapters = new List<ChapterItem>();
+        //章节页合集
+        public List<string> chapterPages = new List<string>();
+
+        analysis()
+        {
+            
+        }
         public int check_chapter_files(ChapterItem chapter)
         {
             throw new NotImplementedException();

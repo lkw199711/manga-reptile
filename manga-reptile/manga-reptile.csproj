@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="class\analysis.cs" />
+    <Compile Include="class\global.cs" />
     <Compile Include="form-index.cs">
       <SubType>Form</SubType>
     </Compile>
