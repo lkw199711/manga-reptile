@@ -11,58 +11,88 @@ using lkw;
 
 namespace manga_reptile
 {
-    class analysis
+    abstract class analysis
     {
         Lkw lkw = new Lkw();
 
         //漫画名称
-        public string name;
+        protected string name;
         //漫画主页链接
-        public string url;
+        protected string url;
         //漫画主页html代码
-        private string html;
+        protected string html;
         //漫画网站名称
-        public string webSiteName;
+        protected string webSiteName;
         //漫画网站标识
-        public string webSiteMark;
+        protected string webSiteMark;
         //漫画下载路径
-        private string downloadRoute;
+        protected string downloadRoute;
         //章节合集
-        public List<ChapterItem> chapters = new List<ChapterItem>();
+        protected List<ChapterItem> chapters = new List<ChapterItem>();
         //章节页合集
-        public List<string> chapterPages = new List<string>();
+        protected List<string> chapterPages = new List<string>();
         //章节链接合集-下载用
-        private List<string> chapterUrls = new List<string>();
+        protected List<string> chapterUrls = new List<string>();
 
         /// <summary>
         /// 初始化实例
         /// </summary>
         /// <param name="url">漫画首页的链接</param>
-        analysis(string url)
+        protected void init()
         {
-            this.url = url;
             this.downloadRoute = global.downloadRoute + "\\" + this.webSiteName + "\\";
             //设置网站标识
             global.website = this.webSiteMark;
             //获取漫画主页数据
-            this.name = this.get_manga_name(html);
+            this.html=
+            //获取漫画名称
+            this.name = this.get_manga_name(this.html);
             //获取所有页码页面
-            this.chapterPages = this.get_chapter_pages(url);
+            this.chapterPages = this.get_chapter_pages(this.url);
             //获取所有章节链接
             this.chapterPages.ForEach((string i) => { this.chapterUrls = chapterUrls.Union(this.get_chapter_url(i)).ToList(); });
             //获取章节图片
             this.chapterUrls.ForEach((string i) => { this.chapters.Add(this.get_chapter_images(i)); });
             //下载章节图片
             this.chapters.ForEach((ChapterItem i) => { this.download_chapter_images(i); });
-            
         }
+
+        /// <summary>
+        /// 获取页面内所有图片的链接
+        /// </summary>
+        /// <param name="html">当前漫画浏览页的html代码</param>
+        /// <returns>当前页面所有图片的链接</returns>
+        protected abstract ChapterItem get_chapter_images(string html);
+
+        /// <summary>
+        /// 获取所有章节的链接
+        /// </summary>
+        /// <param name="html">当前漫画目录页的html代码</param>
+        /// <returns>当前页面所有章节的链接</returns>
+        protected abstract List<string> get_chapter_url(string html);
+
+        /// <summary>
+        /// 获取章节分页
+        /// 有些网站在漫画章节目录也会进行分页，使得其在章节首页只展出一部分内容
+        /// 调用此方法获取全部的页面
+        /// </summary>
+        /// <param name="html">漫画首页的html代码</param>
+        /// <returns>所有的页码的html代码</returns>
+        protected abstract List<string> get_chapter_pages(string html);
+
+        /// <summary>
+        /// 获取漫画名称
+        /// </summary>
+        /// <param name="html">漫画主页的html数据</param>
+        /// <returns>漫画名称</returns>
+        protected abstract string get_manga_name(string html);
 
         /// <summary>
         /// 校验当前章节的图片数量
         /// </summary>
         /// <param name="chapter">当前章节的实体类</param>
         /// <returns>返回当前章节下载的错误数量</returns>
-        private int check_chapter_files(ChapterItem chapter, string route)
+        protected int check_chapter_files(ChapterItem chapter, string route)
         {
             //错误数量
             int error = 0;
@@ -73,7 +103,7 @@ namespace manga_reptile
             //后缀名
             string suffix = chapter.suffix;
 
-            for(int i = 0; i < l; i++)
+            for (int i = 0; i < l; i++)
             {
                 //生成文件名
                 string fileName = route + i.ToString() + suffix;
@@ -99,12 +129,12 @@ namespace manga_reptile
         /// </summary>
         /// <param name="chapter">当前章节的实体类</param>
         /// <returns>返回当前章节的图片数量</returns>
-        private int download_chapter_images(ChapterItem chapter)
+        protected int download_chapter_images(ChapterItem chapter)
         {
             //图片下载链接
             List<string> images = chapter.images;
             //下载路径
-            string route = this.downloadRoute + chapter.name+"\\";
+            string route = this.downloadRoute + chapter.name + "\\";
             //执行下载
             images.ForEach((string i) => {
                 download_image_by_http(i, route);
@@ -118,53 +148,11 @@ namespace manga_reptile
         }
 
         /// <summary>
-        /// 获取页面内所有图片的链接
-        /// </summary>
-        /// <param name="html">当前漫画浏览页的html代码</param>
-        /// <returns>当前页面所有图片的链接</returns>
-        private ChapterItem get_chapter_images(string html)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// 获取所有章节的链接
-        /// </summary>
-        /// <param name="html">当前漫画目录页的html代码</param>
-        /// <returns>当前页面所有章节的链接</returns>
-        private List<string> get_chapter_url(string html)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// 获取章节分页
-        /// 有些网站在漫画章节目录也会进行分页，使得其在章节首页只展出一部分内容
-        /// 调用此方法获取全部的页面
-        /// </summary>
-        /// <param name="html">漫画首页的html代码</param>
-        /// <returns>所有的页码的html代码</returns>
-        private List<string> get_chapter_pages(string html)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// 获取漫画名称
-        /// </summary>
-        /// <param name="html">漫画主页的html数据</param>
-        /// <returns>漫画名称</returns>
-        private string get_manga_name(string html)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
         /// 根据链接获取页面html代码-使用请求
         /// </summary>
         /// <param name="url">链接地址</param>
         /// <returns>html代码</returns>
-        private static string get_html_by_request(string url, string cookie = "", string referer = "")
+        protected static string get_html_by_request(string url, string cookie = "", string referer = "")
         {
             var data = new byte[4];
             new Random().NextBytes(data);
@@ -228,7 +216,7 @@ namespace manga_reptile
         /// </summary>
         /// <param name="url">链接地址</param>
         /// <returns>html代码</returns>
-        private static string get_html_by_browser(string url, string cookie = "", string referer = "")
+        protected static string get_html_by_browser(string url, string cookie = "", string referer = "")
         {
             throw new NotImplementedException();
         }
@@ -239,7 +227,7 @@ namespace manga_reptile
         /// <param name="url">下载文件地址</param>
         /// <param name="path">文件存放地址，包含文件名</param>
         /// <returns>文件是否保存成功</returns>
-        private static bool download_image_by_http(string url, string path)
+        protected static bool download_image_by_http(string url, string path)
         {
             if (System.IO.File.Exists(path))
             {
@@ -290,7 +278,7 @@ namespace manga_reptile
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        private static string get_image_suffix(string fileName)
+        protected static string get_image_suffix(string fileName)
         {
             return Regex.Match(fileName, "\\.(jpg|jpeg|png|bmp|gif|webp)", RegexOptions.IgnoreCase).Value;
         }
