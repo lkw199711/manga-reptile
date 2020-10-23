@@ -53,7 +53,7 @@
     <Compile Include="form-index.Designer.cs">
       <DependentUpon>form-index.cs</DependentUpon>
     </Compile>
-    <Compile Include="interface\analysis.cs" />
+    <Compile Include="class\interface\analysis.cs" />
     <Compile Include="program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="form-index.resx">
