@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace manga_reptile
 {
-    static class Program
+    static class program
     {
         /// <summary>
         /// 应用程序的主入口点。

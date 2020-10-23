@@ -1,0 +1,10 @@
+D:\1visual-studio\manga-reptile\manga-reptile\bin\Debug\manga-reptile.exe.config
+D:\1visual-studio\manga-reptile\manga-reptile\bin\Debug\manga-reptile.exe
+D:\1visual-studio\manga-reptile\manga-reptile\bin\Debug\manga-reptile.pdb
+D:\1visual-studio\manga-reptile\manga-reptile\obj\Debug\manga-reptile.csprojAssemblyReference.cache
+D:\1visual-studio\manga-reptile\manga-reptile\obj\Debug\manga_reptile.FormIndex.resources
+D:\1visual-studio\manga-reptile\manga-reptile\obj\Debug\manga_reptile.Properties.Resources.resources
+D:\1visual-studio\manga-reptile\manga-reptile\obj\Debug\manga-reptile.csproj.GenerateResource.cache
+D:\1visual-studio\manga-reptile\manga-reptile\obj\Debug\manga-reptile.csproj.CoreCompileInputs.cache
+D:\1visual-studio\manga-reptile\manga-reptile\obj\Debug\manga-reptile.exe
+D:\1visual-studio\manga-reptile\manga-reptile\obj\Debug\manga-reptile.pdb
