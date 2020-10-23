@@ -5,11 +5,14 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using lkw;
 
 namespace manga_reptile
 {
     class analysis
     {
+        Lkw lkw = new Lkw();
+
         //漫画名称
         public string name;
         //漫画主页链接
@@ -59,6 +62,26 @@ namespace manga_reptile
         /// <returns>返回当前章节下载的错误数量</returns>
         private int check_chapter_files(ChapterItem chapter, string route)
         {
+            //错误数量
+            int error = 0;
+            //图片列表
+            List<string> images = chapter.images;
+            //图片数量
+            int l = images.Count;
+            //后缀名
+            string suffix = chapter.suffix;
+
+            for(int i = 0; i < l; i++)
+            {
+                //生成文件名
+                string fileName = route + i.ToString() + suffix;
+                //如果存在则跳出，不记录错误
+                if (File.Exists(fileName)) continue;
+
+            }
+
+
+
             throw new NotImplementedException();
         }
 
@@ -69,14 +92,15 @@ namespace manga_reptile
         /// <returns>返回当前章节的图片数量</returns>
         private int download_chapter_images(ChapterItem chapter)
         {
-            List<string> images = chapter.imageList;
+            List<string> images = chapter.images;
             string route = this.downloadRoute + chapter.name;
 
             images.ForEach((string i) => {
                 http_download(i, route);
             });
 
-            this.check_chapter_files(chapter,route);
+            //校验图片数量
+            this.check_chapter_files(chapter, route);
 
             throw new NotImplementedException();
         }
@@ -259,6 +283,7 @@ namespace manga_reptile
     {
         public string name;
         public string url;
-        public List<string> imageList;
+        public string suffix;
+        public List<string> images;
     }
 }
