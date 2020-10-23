@@ -6,11 +6,6 @@ using System.Threading.Tasks;
 
 namespace manga_reptile
 {
-
-    interface IAnalysis
-    {
-        
-    }
     class analysis
     {
         IDictionary<string, string> imageItem = new Dictionary<string, string>();
