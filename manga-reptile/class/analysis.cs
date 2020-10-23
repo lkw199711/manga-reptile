@@ -6,10 +6,42 @@ using System.Threading.Tasks;
 
 namespace manga_reptile
 {
-    class analysis
+    class analysis : IAnalysis
     {
-        IDictionary<string, string> imageItem = new Dictionary<string, string>();
-        
+        public int check_chapter_files(ChapterItem chapter)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int download_chapter_images(ChapterItem chapter)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<string> get_chapter_images(string html)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<string> get_chapter_list(string html)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<string> get_chapter_pages(string html)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string get_html_by_browser(string url)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string get_html_by_request(string url)
+        {
+            throw new NotImplementedException();
+        }
     }
     /// <summary>
     /// 章节类
