@@ -25,6 +25,8 @@ namespace manga_reptile
         protected string webSiteName;
         //漫画网站标识
         protected string webSiteMark;
+        //漫画网站域名
+        protected string webSiteDomain;
         //漫画下载路径
         protected string downloadRoute;
         //章节合集
@@ -48,7 +50,7 @@ namespace manga_reptile
             //获取漫画名称
             this.name = this.get_manga_name(this.html);
             //获取所有页码页面
-            this.chapterPages = this.get_chapter_pages(this.url);
+            this.chapterPages = this.get_chapter_pages(this.html);
             //获取所有章节链接
             this.chapterPages.ForEach((string i) => { this.chapterUrls = chapterUrls.Union(this.get_chapter_url(i)).ToList(); });
             //获取章节图片
@@ -152,7 +154,7 @@ namespace manga_reptile
         /// </summary>
         /// <param name="url">链接地址</param>
         /// <returns>html代码</returns>
-        protected static string get_html_by_request(string url, string cookie = "", string referer = "")
+        protected string get_html_by_request(string url, string cookie = "", string referer = "")
         {
             var data = new byte[4];
             new Random().NextBytes(data);
@@ -282,6 +284,27 @@ namespace manga_reptile
         {
             return Regex.Match(fileName, "\\.(jpg|jpeg|png|bmp|gif|webp)", RegexOptions.IgnoreCase).Value;
         }
+
+        /// <summary>
+        /// 格式化文件名-章节名
+        /// 去除换行符等特殊字符,保证创建文件夹的安全
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        protected string format_file_name(string str)
+        {
+            //替换关键字
+            string[] key = { "\n", "<", ">", "\\", "/", "|", ":", "*", "?" };
+            
+            //循环替换
+            for(int i = 0, l = key.Length; i < l; i++)
+            {
+                str = str.Replace(key[i], "");
+            }
+
+            //返回格式化后的结果
+            return str;
+        }
     }
     /// <summary>
     /// 章节类
@@ -296,7 +319,7 @@ namespace manga_reptile
         public string suffix;
         public List<string> images;
 
-        ChapterItem(string name,string url,string suffix, List<string> images)
+        public ChapterItem(string name,string url,string suffix, List<string> images)
         {
             this.name = name;
             this.url = url;

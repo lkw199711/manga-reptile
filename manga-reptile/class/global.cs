@@ -12,4 +12,15 @@ namespace manga_reptile
         public static string website;
         public static string downloadRoute;
     }
+
+    class utils
+    {
+        public static string format_file_name(string str)
+        {
+            return str.Replace("\n", "")
+                .Replace("(", "")
+                .Replace(")", "")
+                .Replace("_", "");
+        }
+    }
 }

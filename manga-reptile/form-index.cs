@@ -37,7 +37,8 @@ namespace manga_reptile
         /// <param name="e"></param>
         private void buttonTest_Click(object sender, EventArgs e)
         {
-            JinMan jiman = new JinMan("https://18comic2.biz/album/223523/");
+            string url = textUrl.Text;
+            JinMan jiman = new JinMan(url);
         }
     }
 }
