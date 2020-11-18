@@ -1,4 +1,5 @@
-﻿using System;
+﻿using lkw;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,8 +8,10 @@ using System.Threading.Tasks;
 
 namespace manga_reptile
 {
+
     class JinMan : analysis
     {
+        Lkw lkw = new Lkw();
         public JinMan(string url)
         {
             //获取链接
@@ -23,12 +26,31 @@ namespace manga_reptile
             this.init();
         }
 
-        protected override ChapterItem get_chapter_images(string html)
+        protected override ChapterItem get_chapter_images(string url)
         {
-            Console.WriteLine(html);
-            System.Environment.Exit(0);
+            List<string> list = new List<string>();
+            //获取页面的html代码
+            string html = this.get_html_by_request(url);
+            //获取章节名称
+            string chapterName = new Regex("(?<=pull-left\\shidden\">)[^<]+", RegexOptions.Singleline).Match(html).Value;
 
-            return new ChapterItem("","","",new List<string>());
+            //截取图片链接部分
+            string imageBox = new Regex("(?<=row\\sthumb-overlay-albums).+?(?=tab-content\\sm-b-20\\sm-t-15)", RegexOptions.Singleline).Match(html).Value;
+
+            //获取所有图片链接
+            MatchCollection src = new Regex("(?<=data-original=\")http[^\"]+[.png|.jpg]*(?=\")", RegexOptions.Singleline).Matches(imageBox);
+
+            //获取图片的扩展名
+            string suffix = this.get_image_suffix(src[0].Value);
+
+            foreach (Match m in src)
+            {
+                list.Add(m.Value);
+            }
+
+            /*
+             生成章节实体类 (章节名,链接,图片扩展名,图片链接list)*/
+            return new ChapterItem(chapterName, url, suffix, list);
         }
 
         /// <summary>
@@ -61,17 +83,27 @@ namespace manga_reptile
             //截取包含章节列表的部分
             string chapterBox = new Regex("(?<=btn-toolbar).+?(?=visible-lg)", RegexOptions.Singleline).Match(html).Value;
 
-            //获取所有章节链接
-            MatchCollection hrefList = new Regex("/photo/[\\d]+").Matches(chapterBox);
+            //获取所有章节内容
+            MatchCollection chapterList = new Regex("<a\\shref.+?</a>", RegexOptions.Singleline).Matches(chapterBox);
 
-            foreach (Match m in hrefList)
+            for (int i = 0, l = chapterList.Count; i < l; i++)
             {
-                //拼接处理,形成完整链接
-                string url = "http://" + this.webSiteDomain + m.Value;
-                //获取html代码
-                string chapterHtml = this.get_html_by_request(url);
+                //章节内容
+                string str = chapterList[i].Value;
+                //章节链接
+                string href = new Regex("/photo/[\\d]+").Match(str).Value;
+                //章节名
+                string name = new Regex("(?<=<li[^>]+>)[^<]+").Match(str).Value;
 
-                list.Add(chapterHtml);
+                name = this.format_file_name(name);
+
+                //拼接处理,形成完整链接
+                string url = "http://" + this.webSiteDomain + href;
+
+                //解析所有页面时间过长 加入提示机制
+                lkw.log("正在解析章节 " + i.ToString() + " " + name);
+
+                list.Add(url);
             }
 
             return list;

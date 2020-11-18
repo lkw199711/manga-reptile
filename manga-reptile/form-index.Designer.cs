@@ -30,6 +30,7 @@
         {
             this.textUrl = new System.Windows.Forms.TextBox();
             this.buttonTest = new System.Windows.Forms.Button();
+            this.labelMessage = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // textUrl
@@ -49,11 +50,22 @@
             this.buttonTest.UseVisualStyleBackColor = true;
             this.buttonTest.Click += new System.EventHandler(this.buttonTest_Click);
             // 
+            // labelMessage
+            // 
+            this.labelMessage.AutoSize = true;
+            this.labelMessage.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.labelMessage.Location = new System.Drawing.Point(69, 263);
+            this.labelMessage.Name = "labelMessage";
+            this.labelMessage.Size = new System.Drawing.Size(90, 21);
+            this.labelMessage.TabIndex = 2;
+            this.labelMessage.Text = "消息提示栏";
+            // 
             // FormIndex
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.labelMessage);
             this.Controls.Add(this.buttonTest);
             this.Controls.Add(this.textUrl);
             this.Name = "FormIndex";
@@ -68,6 +80,7 @@
 
         private System.Windows.Forms.TextBox textUrl;
         private System.Windows.Forms.Button buttonTest;
+        private System.Windows.Forms.Label labelMessage;
     }
 }
 

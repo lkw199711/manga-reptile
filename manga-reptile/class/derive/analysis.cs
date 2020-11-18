@@ -62,9 +62,9 @@ namespace manga_reptile
         /// <summary>
         /// 获取页面内所有图片的链接
         /// </summary>
-        /// <param name="html">当前漫画浏览页的html代码</param>
+        /// <param name="html">当前漫画浏览页的url链接</param>
         /// <returns>当前页面所有图片的链接</returns>
-        protected abstract ChapterItem get_chapter_images(string html);
+        protected abstract ChapterItem get_chapter_images(string url);
 
         /// <summary>
         /// 获取所有章节的链接
@@ -280,7 +280,7 @@ namespace manga_reptile
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        protected static string get_image_suffix(string fileName)
+        protected string get_image_suffix(string fileName)
         {
             return Regex.Match(fileName, "\\.(jpg|jpeg|png|bmp|gif|webp)", RegexOptions.IgnoreCase).Value;
         }
