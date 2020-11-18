@@ -33,6 +33,7 @@ namespace manga_reptile
             string html = this.get_html_by_request(url);
             //获取章节名称
             string chapterName = new Regex("(?<=pull-left\\shidden\">)[^<]+", RegexOptions.Singleline).Match(html).Value;
+            chapterName = this.format_file_name(chapterName);
 
             //截取图片链接部分
             string imageBox = new Regex("(?<=row\\sthumb-overlay-albums).+?(?=tab-content\\sm-b-20\\sm-t-15)", RegexOptions.Singleline).Match(html).Value;
