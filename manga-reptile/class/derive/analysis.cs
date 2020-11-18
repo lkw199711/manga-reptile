@@ -44,7 +44,7 @@ namespace manga_reptile
             //设置网站标识
             global.website = this.webSiteMark;
             //获取漫画主页数据
-            this.html=
+            this.html = get_html_by_request(this.url);
             //获取漫画名称
             this.name = this.get_manga_name(this.html);
             //获取所有页码页面

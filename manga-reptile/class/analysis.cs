@@ -8,7 +8,7 @@ namespace manga_reptile
 {
     class JinMan : analysis
     {
-        JinMan(string url)
+        public JinMan(string url)
         {
             //获取链接
             this.url = url;

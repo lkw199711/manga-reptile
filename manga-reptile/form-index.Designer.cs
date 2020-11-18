@@ -28,21 +28,46 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.textUrl = new System.Windows.Forms.TextBox();
+            this.buttonTest = new System.Windows.Forms.Button();
             this.SuspendLayout();
+            // 
+            // textUrl
+            // 
+            this.textUrl.Location = new System.Drawing.Point(71, 55);
+            this.textUrl.Name = "textUrl";
+            this.textUrl.Size = new System.Drawing.Size(412, 21);
+            this.textUrl.TabIndex = 0;
+            // 
+            // buttonTest
+            // 
+            this.buttonTest.Location = new System.Drawing.Point(539, 154);
+            this.buttonTest.Name = "buttonTest";
+            this.buttonTest.Size = new System.Drawing.Size(75, 23);
+            this.buttonTest.TabIndex = 1;
+            this.buttonTest.Text = "调试";
+            this.buttonTest.UseVisualStyleBackColor = true;
+            this.buttonTest.Click += new System.EventHandler(this.buttonTest_Click);
             // 
             // FormIndex
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.buttonTest);
+            this.Controls.Add(this.textUrl);
             this.Name = "FormIndex";
             this.Text = "爬虫";
             this.Load += new System.EventHandler(this.FormIndex_Load);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
         #endregion
+
+        private System.Windows.Forms.TextBox textUrl;
+        private System.Windows.Forms.Button buttonTest;
     }
 }
 
