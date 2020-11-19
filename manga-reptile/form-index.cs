@@ -38,7 +38,19 @@ namespace manga_reptile
         private void buttonTest_Click(object sender, EventArgs e)
         {
             string url = textUrl.Text;
-            JinMan jiman = new JinMan(url);
+            JinMan jiman = new JinMan(url, this);
+        }
+        /// <summary>
+        /// 通过委托事件 更改label控件的文本
+        /// </summary>
+        /// <param name="label"></param>
+        /// <param name="text"></param>
+        public static void set_label_text(Label label, string text)
+        {
+            Action<String> AsyncUIDelegate = delegate (string n) { label.Text = n; };//定义一个委托
+
+            label.Invoke(AsyncUIDelegate, new object[] { text });
+
         }
     }
 }

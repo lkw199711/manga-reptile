@@ -11,9 +11,12 @@ namespace manga_reptile
 
     class JinMan : analysis
     {
+        public FormIndex form;
+
         Lkw lkw = new Lkw();
-        public JinMan(string url)
+        public JinMan(string url, FormIndex formIndex)
         {
+            form = formIndex;
             //获取链接
             this.url = url;
             //设置漫画网站名称
@@ -102,7 +105,7 @@ namespace manga_reptile
                 string url = "http://" + this.webSiteDomain + href;
 
                 //解析所有页面时间过长 加入提示机制
-                lkw.log("正在解析章节 " + i.ToString() + " " + name);
+                show_message("正在解析章节 " + i.ToString() + " " + name);
 
                 list.Add(url);
                 lkw.log(url);
@@ -128,6 +131,15 @@ namespace manga_reptile
             mangaName = this.format_file_name(mangaName);
 
             return mangaName;
+        }
+
+        /// <summary>
+        /// 输出消息信息
+        /// </summary>
+        /// <param name="msg">消息内容</param>
+        protected override void show_message(string msg)
+        {
+            FormIndex.set_label_text(form.labelMessage, msg);
         }
     }
 }

@@ -92,6 +92,12 @@ namespace manga_reptile
         protected abstract string get_manga_name(string html);
 
         /// <summary>
+        /// 展示消息
+        /// </summary>
+        /// <param name="msg"></param>
+        protected abstract void show_message(string msg);
+
+        /// <summary>
         /// 校验当前章节的图片数量
         /// </summary>
         /// <param name="chapter">当前章节的实体类</param>
@@ -145,6 +151,9 @@ namespace manga_reptile
             //执行下载
             for (int i = 0, l = images.Count; i < l; i++)
             {
+                //输出提示信息
+                this.show_message("正在下载章节\"" + chapter.name + "+\"" + "第" + i.ToString() + "张图片.");
+                //下载图片
                 download_image_by_http(images[i], route + i.ToString() + suffix);
             }
 
@@ -311,6 +320,8 @@ namespace manga_reptile
             //返回格式化后的结果
             return str;
         }
+
+
     }
     /// <summary>
     /// 章节类
