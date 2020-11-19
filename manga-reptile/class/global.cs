@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace manga_reptile
 {
-    
+
     class global
     {
         public static string website;
-        public static string downloadRoute="../";
+        public static string downloadRoute = @"G:\10临时";
     }
 
     class utils

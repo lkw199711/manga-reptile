@@ -42,13 +42,15 @@ namespace manga_reptile
         /// <param name="url">漫画首页的链接</param>
         protected void init()
         {
-            this.downloadRoute = global.downloadRoute + "\\" + this.webSiteName + "\\";
+            string route = global.downloadRoute + "\\" + this.webSiteName + "\\";
             //设置网站标识
             global.website = this.webSiteMark;
             //获取漫画主页数据
             this.html = get_html_by_request(this.url);
             //获取漫画名称
             this.name = this.get_manga_name(this.html);
+            //构建下载路径
+            this.downloadRoute = route + this.name + "\\";
             //获取所有页码页面
             this.chapterPages = this.get_chapter_pages(this.html);
             //获取所有章节链接
@@ -137,11 +139,14 @@ namespace manga_reptile
             List<string> images = chapter.images;
             //下载路径
             string route = this.downloadRoute + chapter.name + "\\";
+            //后缀名
+            string suffix = chapter.suffix;
 
             //执行下载
-            images.ForEach((string i) => {
-                download_image_by_http(i, route);
-            });
+            for (int i = 0, l = images.Count; i < l; i++)
+            {
+                download_image_by_http(images[i], route + i.ToString() + suffix);
+            }
 
             //校验图片数量
             this.check_chapter_files(chapter, route);
@@ -295,10 +300,10 @@ namespace manga_reptile
         protected string format_file_name(string str)
         {
             //替换关键字
-            string[] key = { "\n", "<", ">", "\\", "/", "|", ":", "*", "?" };
-            
+            string[] key = { "\n", "<", ">", "\\", "/", "|", ":", "*", "?", " " };
+
             //循环替换
-            for(int i = 0, l = key.Length; i < l; i++)
+            for (int i = 0, l = key.Length; i < l; i++)
             {
                 str = str.Replace(key[i], "");
             }
@@ -320,7 +325,7 @@ namespace manga_reptile
         public string suffix;
         public List<string> images;
 
-        public ChapterItem(string name,string url,string suffix, List<string> images)
+        public ChapterItem(string name, string url, string suffix, List<string> images)
         {
             this.name = name;
             this.url = url;

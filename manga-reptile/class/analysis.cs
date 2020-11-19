@@ -105,6 +105,7 @@ namespace manga_reptile
                 lkw.log("正在解析章节 " + i.ToString() + " " + name);
 
                 list.Add(url);
+                lkw.log(url);
             }
 
             return list;
