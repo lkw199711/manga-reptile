@@ -1,4 +1,5 @@
-﻿using System;
+﻿using lkw;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -12,6 +13,8 @@ namespace manga_reptile
 {
     public partial class FormIndex : Form
     {
+        Lkw lkw = new Lkw();
+
         /// <summary>
         /// 窗口初始化
         /// </summary>
@@ -38,8 +41,12 @@ namespace manga_reptile
         private void buttonTest_Click(object sender, EventArgs e)
         {
             string url = textUrl.Text;
-            JinMan jiman = new JinMan(url, this);
+
+            //新线程下载
+            lkw.NewWork(() => { JinMan jiman = new JinMan(url, this); });
+            
         }
+
         /// <summary>
         /// 通过委托事件 更改label控件的文本
         /// </summary>

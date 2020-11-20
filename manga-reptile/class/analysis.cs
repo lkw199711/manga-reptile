@@ -13,10 +13,16 @@ namespace manga_reptile
     {
         public FormIndex form;
 
-        Lkw lkw = new Lkw();
+        //Lkw lkw = new Lkw();
+
+        /// <summary>
+        /// 初始化方法
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="formIndex"></param>
         public JinMan(string url, FormIndex formIndex)
         {
-            form = formIndex;
+            this.form = formIndex;
             //获取链接
             this.url = url;
             //设置漫画网站名称
@@ -139,7 +145,7 @@ namespace manga_reptile
         /// <param name="msg">消息内容</param>
         protected override void show_message(string msg)
         {
-            FormIndex.set_label_text(form.labelMessage, msg);
+            FormIndex.set_label_text(this.form.labelMessage, msg);
         }
     }
 }
