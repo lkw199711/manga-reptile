@@ -10,7 +10,7 @@ namespace manga_reptile
     class global
     {
         public static string website;
-        public static string downloadRoute = @"G:\10临时";
+        public static string downloadRoute = @"G:\10临时\";
     }
 
     class utils
