@@ -42,13 +42,15 @@ namespace manga_reptile
         /// <param name="url">漫画首页的链接</param>
         protected void init()
         {
-            this.downloadRoute = global.downloadRoute + "\\" + this.webSiteName + "\\";
+            string route = global.downloadRoute + "\\" + this.webSiteName + "\\";
             //设置网站标识
             global.website = this.webSiteMark;
             //获取漫画主页数据
             this.html = get_html_by_request(this.url);
             //获取漫画名称
             this.name = this.get_manga_name(this.html);
+            //构建下载路径
+            this.downloadRoute = route + this.name + "\\";
             //获取所有页码页面
             this.chapterPages = this.get_chapter_pages(this.html);
             //获取所有章节链接
@@ -88,6 +90,12 @@ namespace manga_reptile
         /// <param name="html">漫画主页的html数据</param>
         /// <returns>漫画名称</returns>
         protected abstract string get_manga_name(string html);
+
+        /// <summary>
+        /// 展示消息
+        /// </summary>
+        /// <param name="msg"></param>
+        protected abstract void show_message(string msg);
 
         /// <summary>
         /// 校验当前章节的图片数量
@@ -137,11 +145,17 @@ namespace manga_reptile
             List<string> images = chapter.images;
             //下载路径
             string route = this.downloadRoute + chapter.name + "\\";
+            //后缀名
+            string suffix = chapter.suffix;
 
             //执行下载
-            images.ForEach((string i) => {
-                download_image_by_http(i, route);
-            });
+            for (int i = 0, l = images.Count; i < l; i++)
+            {
+                //输出提示信息
+                this.show_message("正在下载章节\"" + chapter.name + "+\"" + "第" + i.ToString() + "张图片.");
+                //下载图片
+                download_image_by_http(images[i], route + i.ToString() + suffix);
+            }
 
             //校验图片数量
             this.check_chapter_files(chapter, route);
@@ -295,10 +309,10 @@ namespace manga_reptile
         protected string format_file_name(string str)
         {
             //替换关键字
-            string[] key = { "\n", "<", ">", "\\", "/", "|", ":", "*", "?" };
-            
+            string[] key = { "\n", "<", ">", "\\", "/", "|", ":", "*", "?", " " };
+
             //循环替换
-            for(int i = 0, l = key.Length; i < l; i++)
+            for (int i = 0, l = key.Length; i < l; i++)
             {
                 str = str.Replace(key[i], "");
             }
@@ -306,6 +320,8 @@ namespace manga_reptile
             //返回格式化后的结果
             return str;
         }
+
+
     }
     /// <summary>
     /// 章节类
@@ -320,7 +336,7 @@ namespace manga_reptile
         public string suffix;
         public List<string> images;
 
-        public ChapterItem(string name,string url,string suffix, List<string> images)
+        public ChapterItem(string name, string url, string suffix, List<string> images)
         {
             this.name = name;
             this.url = url;

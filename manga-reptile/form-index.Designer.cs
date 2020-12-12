@@ -80,7 +80,7 @@
 
         private System.Windows.Forms.TextBox textUrl;
         private System.Windows.Forms.Button buttonTest;
-        private System.Windows.Forms.Label labelMessage;
+        public System.Windows.Forms.Label labelMessage;
     }
 }
 
