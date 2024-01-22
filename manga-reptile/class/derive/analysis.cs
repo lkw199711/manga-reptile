@@ -34,7 +34,7 @@ namespace manga_reptile
         //章节页合集
         protected List<string> chapterPages = new List<string>();
         //章节链接合集-下载用
-        protected List<string> chapterUrls = new List<string>();
+        protected List<ChapterItem> chapterUrls = new List<ChapterItem>();
 
         /// <summary>
         /// 初始化实例
@@ -42,6 +42,8 @@ namespace manga_reptile
         /// <param name="url">漫画首页的链接</param>
         protected void init()
         {
+            // 错误参数 退出
+            if (this.url == "") return;
             string route = global.downloadRoute + "\\" + this.webSiteName + "\\";
             //设置网站标识
             global.website = this.webSiteMark;
@@ -56,9 +58,9 @@ namespace manga_reptile
             //获取所有章节链接
             this.chapterPages.ForEach((string i) => { this.chapterUrls = chapterUrls.Union(this.get_chapter_url(i)).ToList(); });
             //获取章节图片
-            this.chapterUrls.ForEach((string i) => { this.chapters.Add(this.get_chapter_images(i)); });
+            this.chapterUrls.ForEach((ChapterItem i) => { this.chapters.Add(this.get_chapter_images(i)); });
             //下载章节图片
-            this.chapters.ForEach((ChapterItem i) => { this.download_chapter_images(i); });
+            //this.chapters.ForEach((ChapterItem i) => { this.download_chapter_images(i); });
         }
 
         /// <summary>
@@ -66,14 +68,14 @@ namespace manga_reptile
         /// </summary>
         /// <param name="html">当前漫画浏览页的url链接</param>
         /// <returns>当前页面所有图片的链接</returns>
-        protected abstract ChapterItem get_chapter_images(string url);
+        protected abstract ChapterItem get_chapter_images(ChapterItem url);
 
         /// <summary>
         /// 获取所有章节的链接
         /// </summary>
         /// <param name="html">当前漫画目录页的html代码</param>
         /// <returns>当前页面所有章节的链接</returns>
-        protected abstract List<string> get_chapter_url(string html);
+        protected abstract List<ChapterItem> get_chapter_url(string html);
 
         /// <summary>
         /// 获取章节分页
@@ -96,6 +98,14 @@ namespace manga_reptile
         /// </summary>
         /// <param name="msg"></param>
         protected abstract void show_message(string msg);
+
+        protected void write_log(string msg)
+        {
+            msg = DateTime.Now.ToString() + " " + msg;
+
+            Console.WriteLine(msg);
+            lkw.WriteLine("./log.txt", msg);
+        }
 
         /// <summary>
         /// 校验当前章节的图片数量
@@ -123,11 +133,11 @@ namespace manga_reptile
                 if (File.Exists(fileName)) continue;
 
                 //输出错误信息（错误图片序号与链接）
-                lkw.WriteLine(route + "log.txt", "图片" + i + "下载错误 " + fileUrl);
+                //lkw.WriteLine(route + "log.txt", "图片" + i + "下载错误 " + fileUrl);
                 //错误数量+1
                 error++;
                 //再次尝试下载
-                download_image_by_http(fileUrl, fileName);
+                //download_image_by_http(fileUrl, fileName);
             }
 
             //返回错误数量
@@ -157,8 +167,18 @@ namespace manga_reptile
                 download_image_by_http(images[i], route + i.ToString() + suffix);
             }
 
-            //校验图片数量
-            this.check_chapter_files(chapter, route);
+            try
+            {
+                this.delete(route + "temp");
+            }catch (Exception e)
+            {
+                write_log("临时文件删除错误,请检查下载文件");
+                write_log(e.ToString());
+            }
+
+            this.show_message("章节\"" + chapter.name + " 下载完毕");
+
+            this.write_log($"下载章节 {chapter.name}, 共{images.Count.ToString()}张图片.");
 
             //返回图片数量
             return images.Count;
@@ -223,7 +243,8 @@ namespace manga_reptile
             }
             catch (System.Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                write_log("请求html错误 " + url);
+                write_log(ex.ToString());
             }
             return "";
         }
@@ -244,11 +265,11 @@ namespace manga_reptile
         /// <param name="url">下载文件地址</param>
         /// <param name="path">文件存放地址，包含文件名</param>
         /// <returns>文件是否保存成功</returns>
-        protected static bool download_image_by_http(string url, string path)
+        protected bool download_image_by_http(string url, string path)
         {
             if (System.IO.File.Exists(path))
             {
-                System.IO.File.Delete(path);    //存在则删除
+                return false;
             }
 
             string tempPath = System.IO.Path.GetDirectoryName(path) + @"\temp";
@@ -285,7 +306,9 @@ namespace manga_reptile
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                write_log(url);
+                write_log(path);
+                write_log(ex.ToString());
                 return false;
             }
         }
@@ -322,7 +345,32 @@ namespace manga_reptile
         }
 
 
+        /// <summary>
+        /// 删除文件或目录
+        /// </summary>
+        /// <param name="fileName">文件路径</param>
+        public void delete(string fileName)
+        {
+            try { if (Directory.Exists(fileName)) Directory.Delete(fileName, true); } catch (Exception ex) { write_log("删除temp目录错误,,请检查图片未完成下载"); }
+            // 如果是目录,调用文件夹方法
+            
+
+            // 如果是文件,调用文件方法
+            if (File.Exists(fileName)) File.Delete(fileName);
+
+        }
+
+        public void download()
+        {
+            this.chapters.ForEach((ChapterItem i) => { this.download_chapter_images(i); });
+
+            this.show_message("全章节\"" + " 下载完毕");
+        }
+
     }
+
+    
+
     /// <summary>
     /// 章节类
     /// name 章节名称
@@ -334,14 +382,16 @@ namespace manga_reptile
         public string name;
         public string url;
         public string suffix;
+        public int imageNum;
         public List<string> images;
 
-        public ChapterItem(string name, string url, string suffix, List<string> images)
+        public ChapterItem(string name, string url, int imageNum=0, string suffix = "jpg", List<string> images = null)
         {
             this.name = name;
             this.url = url;
             this.suffix = suffix;
             this.images = images;
+            this.imageNum = imageNum;
         }
     }
 }

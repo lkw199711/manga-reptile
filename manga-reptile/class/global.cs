@@ -10,7 +10,8 @@ namespace manga_reptile
     class global
     {
         public static string website;
-        public static string downloadRoute= @"E:\9临时\1漫画\";
+        public static string downloadRoute= @"C:\Users\lkw\OneDrive\0\01manga\00韩漫";
+        public static DateTime subscribeLastRun;
     }
 
     class utils
