@@ -126,7 +126,7 @@ namespace manga_reptile
             string imageBox = new Regex("(?<=gallary_wrap).+?(?=comment_wrap)", RegexOptions.Singleline).Match(html).Value;
 
             //获取所有图片链接
-            //MatchCollection src = new Regex("(?<=src=\").+?[.png|.jpg]*(?=\")", RegexOptions.Singleline).Matches(imageBox);
+            //MatchCollection src = new Regex("(?<=src=\").+?(?=\")", RegexOptions.Singleline).Matches(imageBox);
             MatchCollection src = new Regex("(?<=gallary_item).+?(?=pic_ctl)", RegexOptions.Singleline).Matches(imageBox);
 
             foreach (Match m in src)
