@@ -52,7 +52,7 @@ namespace manga_reptile
             string imageBox = new Regex("(?<=comicpage).+?(?=fanye)", RegexOptions.Singleline).Match(html).Value;
 
             //获取所有图片链接
-            MatchCollection src = new Regex("(?<=data-original=\")http[^\"]+[.png|.jpg]*(?=\")", RegexOptions.Singleline).Matches(imageBox);
+            MatchCollection src = new Regex("(?<=data-original=\")http[^\"]+(?=\")", RegexOptions.Singleline).Matches(imageBox);
 
             //获取图片的扩展名
             if(src.Count>0)
@@ -120,6 +120,20 @@ namespace manga_reptile
                 string name = new Regex("(?<=title=\").+?(?=\")").Match(str).Value;
 
                 name = this.format_file_name(name);
+
+                string chapterIncludes = this.taskParams.chapterIncludes;
+                string chapterExcludes = this.taskParams.chapterExcludes;
+                if (chapterIncludes != "" && !new Regex(chapterIncludes).IsMatch(name))
+                {
+                    lkw.log("跳过" + name);
+                    continue;
+                }
+
+                if (chapterExcludes != "" && new Regex(chapterExcludes).IsMatch(name))
+                {
+                    lkw.log("跳过" + name);
+                    continue;
+                }
 
                 if (Directory.Exists(this.downloadRoute + name))
                 {
@@ -201,7 +215,7 @@ namespace manga_reptile
             string imageBox = new Regex("(?<=comicpage).+?(?=fanye)", RegexOptions.Singleline).Match(html).Value;
 
             //获取所有图片链接
-            MatchCollection src = new Regex("(?<=data-original=\")http[^\"]+[.png|.jpg]*(?=\")", RegexOptions.Singleline).Matches(imageBox);
+            MatchCollection src = new Regex("(?<=data-original=\")http[^\"]+(?=\")", RegexOptions.Singleline).Matches(imageBox);
             this.show_message(src.Count.ToString() + "/" + num.ToString());
             return src.Count>num;
         }

@@ -19,7 +19,7 @@ namespace manga_reptile
         private TaskParams taskParams;
         Lkw lkw = new Lkw();
 
-        
+        private string targetDomain = "";
 
         string currentChapter = "";
         /// <summary>
@@ -37,10 +37,41 @@ namespace manga_reptile
             this.webSiteName = "绅士漫画";
             //设置漫画网站标识
             this.webSiteMark = "hm";
+            this.targetDomain = "hm07.lol";
             //设置漫画网站域名
-            this.webSiteDomain = "hm07.lol";
+            this.webSiteDomain = get_domain();
+
+            if (this.webSiteDomain == "")
+            {
+                this.write_log("网站无法访问");
+                return;
+            }
+
+
+            this.url = this.url.Replace(this.targetDomain, this.webSiteDomain);
+
+
             //执行初始化方法
             this.init();
+        }
+
+        /// <summary>
+        /// 域名有很多 是动态的
+        /// </summary>
+        /// <returns></returns>
+        public string get_domain()
+        {
+            for (int i = 1; i < 10; i++)
+            {
+                string webSiteDomain = $"hm{i.ToString("D2")}.lol";
+                string url = $"https://www.{webSiteDomain}/albums-index-cate-20.html";
+
+                string res = get_html_by_request(url);
+
+                if (res != "") return webSiteDomain;
+            }
+
+            return "";
         }
 
         protected override ChapterItem get_chapter_images(ChapterItem item)
@@ -132,8 +163,8 @@ namespace manga_reptile
             foreach (Match m in src)
             {
                 string str = m.Value;
-                string view = new Regex("(?<=src=\").+?[.png|.jpg]*(?=\")", RegexOptions.Singleline).Match(imageBox).Value;
-                string imgTag = new Regex("(?<=data/t)\\/(\\d+\\/)(\\d+\\/)(?=.+?[.png|.jpg])").Match(view).Value;
+                string view = new Regex("(?<=src=\").+?(?=\")", RegexOptions.Singleline).Match(str).Value;
+                string imgTag = new Regex("(?<=data/t)\\/(\\d+\\/)(\\d+\\/)(?=\\b+)").Match(view).Value;
                 string prefix = new Regex("t.+?\\/data").Match(view).Value;
                 string suffix = Path.GetExtension(view);
 
@@ -290,7 +321,7 @@ namespace manga_reptile
             string imageBox = new Regex("(?<=gallary_wrap).+?(?=comment_wrap)", RegexOptions.Singleline).Match(html).Value;
 
             //获取所有图片链接
-            MatchCollection src = new Regex("(?<=src=\").+?[.png|.jpg]*(?=\")", RegexOptions.Singleline).Matches(imageBox);
+            MatchCollection src = new Regex("(?<=src=\").+?(?=\")", RegexOptions.Singleline).Matches(imageBox);
             this.show_message("正在解析章节 " + this.currentChapter  + (src.Count + baseNum).ToString() + "/" + num.ToString());
             return src.Count+ baseNum >= num || src.Count>=12;
         }

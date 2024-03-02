@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Runtime.InteropServices.ComTypes;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -23,7 +24,6 @@ namespace manga_reptile
     public partial class FormIndex : Form
     {
         Lkw lkw = new Lkw();
-        public List<TaskParams> tasks = new List<TaskParams>();
         public bool running = false;
 
         /// <summary>
@@ -43,9 +43,9 @@ namespace manga_reptile
         {
             config_load();
 
-            task_load();
+            task_run();
 
-            timerSubscribe.Start();
+            //timerSubscribe.Start();
 
             // 设置默认值
             comWebset.Text = "绅士漫画(hm07.lol)";
@@ -61,9 +61,14 @@ namespace manga_reptile
 
             global.downloadRoute = globalJson.downloadRoute;
             global.subscribeLastRun = globalJson.subscribeLastRun;
+            if (globalJson.subscribeInterval > 0) global.subscribeInterval = globalJson.subscribeInterval;
+
+            timerSubscribe.Enabled = globalJson.subscribeEnabeld;
+
+            btnTimerStatus.Text = timerSubscribe.Enabled ? "关闭订阅" : "开启订阅";
         }
 
-        public void config_update(string downloadRoute="",DateTime subscribeLastRun=default)
+        public void config_update(string downloadRoute="",DateTime subscribeLastRun=default, bool subscribeEnabeld = true,int subscribeInterval=0)
         {
             if(downloadRoute == "")
             {
@@ -83,7 +88,12 @@ namespace manga_reptile
                 global.subscribeLastRun = subscribeLastRun;
             }
 
-            Config config = new Config(downloadRoute, subscribeLastRun);
+            if(subscribeInterval == 0)
+            {
+                subscribeInterval = global.subscribeInterval;
+            }
+
+            Config config = new Config(downloadRoute, subscribeLastRun, subscribeEnabeld, subscribeInterval);
 
             string json = JsonConvert.SerializeObject(config, Formatting.Indented);
 
@@ -98,16 +108,24 @@ namespace manga_reptile
         /// <param name="e"></param>
         private void buttonTest_Click(object sender, EventArgs e)
         {
-            DateTime now = DateTime.Now;
+            lkw.msbox(get_domain());
+        }
 
-            Config config = new Config(@"C:\Users\lkw\OneDrive\0\01manga\00韩漫", now);
+        public string get_domain()
+        {
+            for (int i = 1; i < 10; i++)
+            {
+                string webSiteDomain = $"hm{i.ToString("D2")}.lol";
+                string url = $"https://www.{webSiteDomain}/albums-index-cate-20.html";
 
-            string json = JsonConvert.SerializeObject(config, Formatting.Indented);
+                lkw.log(url);
 
-            // 将格式化后的 JSON 写入文本文件
-            File.WriteAllText("./config.json", json);
+                string res = get_html_by_request(url);
 
-            lkw.msbox(now.ToString());
+                if (res != "") return webSiteDomain;
+            }
+
+            return "";
         }
 
         /// <summary>
@@ -195,11 +213,15 @@ namespace manga_reptile
         {
             public string downloadRoute;
             public DateTime subscribeLastRun;
+            public bool subscribeEnabeld;
+            public int subscribeInterval;
 
-            public Config(string downloadRoute, DateTime subscribeLastRun)
+            public Config(string downloadRoute, DateTime subscribeLastRun, bool subscribeEnabeld = true, int subscribeInterval = 10)
             {
                 this.downloadRoute = downloadRoute;
                 this.subscribeLastRun = subscribeLastRun;
+                this.subscribeEnabeld = subscribeEnabeld;
+                this.subscribeInterval = subscribeInterval;
             }   
         }
 
@@ -252,27 +274,32 @@ namespace manga_reptile
             }
         }
 
-        public void task_load() {
+        public List<TaskParams> task_load() {
             // 读取 JSON 文件
             string json = File.ReadAllText("./task.json");
 
             // 反序列化 JSON 到对象
             List<TaskParams> taskJson = JsonConvert.DeserializeObject<List<TaskParams>>(json);
 
-            tasks.AddRange(taskJson);
-
-            task_run();
+            return taskJson;
         }
 
         public void task_add(TaskParams task=null,List<TaskParams> taskArr=null) {
-            if(taskArr!=null) tasks.AddRange(taskArr);
+            // 读取 JSON 文件
+            string json = File.ReadAllText("./task.json");
+
+            // 反序列化 JSON 到对象
+            List<TaskParams> taskJson = JsonConvert.DeserializeObject<List<TaskParams>>(json);
+
+
+            if (taskArr!=null) taskJson.AddRange(taskArr);
 
             task = task == null ? create_params() : task;
             // 添加任务
-            tasks.Add(task);
+            taskJson.Add(task);
 
             // 写入json
-            task_write_json();
+            task_write_json(taskJson);
 
             // 执行任务
             task_run();
@@ -280,6 +307,8 @@ namespace manga_reptile
 
         public void task_run()
         {
+            var tasks = task_load();
+
             if (tasks.Count == 0) { return; }
 
             if (running) return;
@@ -324,17 +353,15 @@ namespace manga_reptile
                 tasks.RemoveAt(0);
 
                 // 写入json
-                task_write_json();
+                task_write_json(tasks);
 
                 // 继续执行任务
                 task_run();
             });
         }
 
-        public void task_write_json()
+        public void task_write_json(List<TaskParams> tasks)
         {
-            TaskJson taskJson = new TaskJson(tasks);
-
             string json = JsonConvert.SerializeObject(tasks, Formatting.Indented);
 
             // 将格式化后的 JSON 写入文本文件
@@ -380,7 +407,7 @@ namespace manga_reptile
             DateTime now = DateTime.Now; // 当前时间点
 
             // 两小时执行一次
-            if ((now - lastRun).TotalHours < 2) return;
+            if ((now - lastRun).TotalHours < global.subscribeInterval) return;
 
             write_log("开始执行订阅任务");
 
@@ -392,7 +419,7 @@ namespace manga_reptile
 
             task_add(taskArr: taskJson);
 
-            config_update(subscribeLastRun: now);
+            config_update(subscribeLastRun: now, subscribeEnabeld:timerSubscribe.Enabled);
         }
 
         private void timerSubscribe_Tick(object sender, EventArgs e)
@@ -410,6 +437,108 @@ namespace manga_reptile
 
             Console.WriteLine(msg);
             lkw.WriteLine("./log.txt", msg);
+        }
+
+        private void btnTimerStatus_Click(object sender, EventArgs e)
+        {
+            timerSubscribe.Enabled = !timerSubscribe.Enabled;
+
+            config_update(subscribeEnabeld: timerSubscribe.Enabled);
+
+            if(timerSubscribe.Enabled)
+            {
+                labelMessage.Text = "已开启订阅事件";
+                btnTimerStatus.Text = "关闭订阅";
+            }
+            else
+            {
+                labelMessage.Text = "已关闭订阅事件";
+                btnTimerStatus.Text = "开启订阅";
+            }
+        }
+
+        /// <summary>
+        /// 根据链接获取页面html代码-使用请求
+        /// </summary>
+        /// <param name="url">链接地址</param>
+        /// <returns>html代码</returns>
+        protected string get_html_by_request(string url, string cookie = "", string referer = "")
+        {
+            var data = new byte[4];
+            new Random().NextBytes(data);
+            string ip = new IPAddress(data).ToString();
+
+            Encoding encode = Encoding.GetEncoding("utf-8");
+            try
+            {
+                //构造httpwebrequest对象，注意，这里要用Create而不是new
+                HttpWebRequest wReq = (HttpWebRequest)WebRequest.Create(url);
+
+                //伪造浏览器数据，避免被防采集程序过滤
+                //wReq.UserAgent = "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0; .NET CLR 1.1.4322; .NET CLR 2.0.50215; CrazyCoder.cn;www.aligong.com)";
+                wReq.UserAgent = "Mozilla/5.0 (Linux; Android 9; Mi Note 3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Mobile Safari/537.36";
+                wReq.Accept = "*/*";
+                wReq.KeepAlive = true;
+                wReq.Headers.Add("cookie", cookie);
+
+                wReq.Headers.Add("origin", referer);
+                wReq.Headers.Add("x-requested-with", "XMLHttpRequest");
+
+                wReq.Headers.Add("pragma", "no-cache");
+                wReq.Headers.Add("Accept-Language", "zh-cn,en-us;q=0.5");
+                wReq.Headers.Add("sec-fetch-dest", "document");
+                wReq.Headers.Add("sec-fetch-mode", "navigate");
+                wReq.Headers.Add("sec-fetch-site", "none");
+                wReq.Headers.Add("sec-fetch-user", "?1");
+
+                //wReq.Headers.Add("User-Agent", "Mozilla/5.0 (Linux; U; Android 9; zh-cn; Mi Note 3 Build/PKQ1.181007.001) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/71.0.3578.141 Mobile Safari/537.36 XiaoMi/MiuiBrowser/11.8.14");
+                //wReq.Headers.Add("Pragma", "no-cache");
+                //wReq.Headers.Add("User-Agent", "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; WOW64; Trident/6.0)");
+                //wReq.Headers.Add("Connection", "Keep-Alive");
+                //随机ip
+                //wReq.Headers.Add("CLIENT-IP", ip);
+                //wReq.Headers.Add("X-FORWARDED-FOR", ip);
+                //注意，为了更全面，可以加上如下一行，避开ASP常用的POST检查              
+
+                wReq.Referer = referer;//您可以将这里替换成您要采集页面的主页
+
+                HttpWebResponse wResp = wReq.GetResponse() as HttpWebResponse;
+                // 获取输入流
+                System.IO.Stream respStream = wResp.GetResponseStream();
+
+                System.IO.StreamReader reader = new System.IO.StreamReader(respStream, encode);
+
+                string content = reader.ReadToEnd();
+                reader.Close();
+                reader.Dispose();
+
+                return content;
+            }
+            catch (System.Exception ex)
+            {
+                write_log("请求html错误 " + url);
+                write_log(ex.ToString());
+            }
+            return "";
+        }
+
+        private void btnHand_Click(object sender, EventArgs e)
+        {
+            write_log("开始执行订阅任务");
+
+            // 获取两个时间点
+            DateTime lastRun = global.subscribeLastRun; // 第一个时间点
+            DateTime now = DateTime.Now; // 当前时间点
+
+            // 读取 JSON 文件
+            string json = File.ReadAllText("./subscribe.json");
+
+            // 反序列化 JSON 到对象
+            List<TaskParams> taskJson = JsonConvert.DeserializeObject<List<TaskParams>>(json);
+
+            task_add(taskArr: taskJson);
+
+            config_update(subscribeLastRun: now, subscribeEnabeld: timerSubscribe.Enabled);
         }
     }
 }

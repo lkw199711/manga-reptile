@@ -104,7 +104,21 @@ namespace manga_reptile
             msg = DateTime.Now.ToString() + " " + msg;
 
             Console.WriteLine(msg);
-            lkw.WriteLine("./log.txt", msg);
+
+            // 获取当前日期
+            DateTime currentDate = DateTime.Now;
+
+            // 构建目录路径
+            string directoryPath = Path.Combine("./log/", currentDate.Year.ToString(), currentDate.Month.ToString("D2"));
+
+            if (!Directory.Exists(directoryPath))
+            {
+                // 创建嵌套目录
+                Directory.CreateDirectory(directoryPath);
+                Console.WriteLine($"已创建目录：{directoryPath}");
+            }
+
+            lkw.WriteLine($"{directoryPath}/{currentDate.Day.ToString("D2")}.txt", msg);
         }
 
         /// <summary>

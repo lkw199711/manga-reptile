@@ -12,6 +12,8 @@ namespace manga_reptile
         public static string website;
         public static string downloadRoute= @"C:\Users\lkw\OneDrive\0\01manga\00韩漫";
         public static DateTime subscribeLastRun;
+        public static bool subscribeEnabeld;
+        public static int subscribeInterval = 12;
     }
 
     class utils

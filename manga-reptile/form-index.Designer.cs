@@ -53,10 +53,12 @@
             this.labelChapterExcludes = new System.Windows.Forms.Label();
             this.labelChapterIncludes = new System.Windows.Forms.Label();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.btnTimerStatus = new System.Windows.Forms.Button();
             this.btnSubscribe = new System.Windows.Forms.Button();
             this.btnAddTask = new System.Windows.Forms.Button();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.timerSubscribe = new System.Windows.Forms.Timer(this.components);
+            this.btnHand = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.bindingSource1)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -86,7 +88,7 @@
             this.labelMessage.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.labelMessage.Location = new System.Drawing.Point(29, 490);
             this.labelMessage.Name = "labelMessage";
-            this.labelMessage.Size = new System.Drawing.Size(481, 21);
+            this.labelMessage.Size = new System.Drawing.Size(481, 403);
             this.labelMessage.TabIndex = 2;
             this.labelMessage.Text = "消息提示栏";
             this.labelMessage.Click += new System.EventHandler(this.labelMessage_Click);
@@ -268,6 +270,8 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.btnHand);
+            this.groupBox3.Controls.Add(this.btnTimerStatus);
             this.groupBox3.Controls.Add(this.btnSubscribe);
             this.groupBox3.Controls.Add(this.btnAddTask);
             this.groupBox3.Controls.Add(this.buttonTest);
@@ -280,6 +284,16 @@
             this.groupBox3.TabIndex = 18;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "操作按钮";
+            // 
+            // btnTimerStatus
+            // 
+            this.btnTimerStatus.Location = new System.Drawing.Point(207, 61);
+            this.btnTimerStatus.Name = "btnTimerStatus";
+            this.btnTimerStatus.Size = new System.Drawing.Size(75, 23);
+            this.btnTimerStatus.TabIndex = 17;
+            this.btnTimerStatus.Text = "订阅状态";
+            this.btnTimerStatus.UseVisualStyleBackColor = true;
+            this.btnTimerStatus.Click += new System.EventHandler(this.btnTimerStatus_Click);
             // 
             // btnSubscribe
             // 
@@ -315,6 +329,16 @@
             // 
             this.timerSubscribe.Interval = 10000;
             this.timerSubscribe.Tick += new System.EventHandler(this.timerSubscribe_Tick);
+            // 
+            // btnHand
+            // 
+            this.btnHand.Location = new System.Drawing.Point(311, 61);
+            this.btnHand.Name = "btnHand";
+            this.btnHand.Size = new System.Drawing.Size(125, 23);
+            this.btnHand.TabIndex = 18;
+            this.btnHand.Text = "手动执行一次订阅";
+            this.btnHand.UseVisualStyleBackColor = true;
+            this.btnHand.Click += new System.EventHandler(this.btnHand_Click);
             // 
             // FormIndex
             // 
@@ -372,6 +396,8 @@
         private System.Windows.Forms.Button btnSubscribe;
         private System.Windows.Forms.Label labelMangaName;
         private System.Windows.Forms.Timer timerSubscribe;
+        private System.Windows.Forms.Button btnTimerStatus;
+        private System.Windows.Forms.Button btnHand;
     }
 }
 

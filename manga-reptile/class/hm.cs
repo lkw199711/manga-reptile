@@ -35,9 +35,24 @@ namespace manga_reptile
             //设置漫画网站标识
             this.webSiteMark = "hm";
             //设置漫画网站域名
-            this.webSiteDomain = "hm07.lol";
+            this.webSiteDomain = get_domain();
             //执行初始化方法
             this.init();
+        }
+
+        public string get_domain()
+        {
+            for (int i = 1; i < 10; i++)
+            {
+                string webSiteDomain = $"hm{i.ToString("D2")}.lol";
+                string url = $"https://www.{webSiteDomain}/albums-index-cate-20.html";
+
+                string res = get_html_by_request(url);
+
+                if (res != "") return webSiteDomain;
+            }
+
+            return "";
         }
 
         protected override ChapterItem get_chapter_images(ChapterItem item)
@@ -53,7 +68,7 @@ namespace manga_reptile
             string imageBox = new Regex("(?<=img_list).+?(?=img_load)", RegexOptions.Singleline).Match(html).Value;
 
             //获取所有图片链接
-            MatchCollection src = new Regex("(?<=src=\").+?[.png|.jpg]*(?=\")", RegexOptions.Singleline).Matches(imageBox);
+            MatchCollection src = new Regex("(?<=src=\").+?(?=\")", RegexOptions.Singleline).Matches(imageBox);
 
             //获取图片的扩展名
             string suffix = ".jpg";
@@ -198,7 +213,7 @@ namespace manga_reptile
             string imageBox = new Regex("(?<=img_list).+?(?=img_load)", RegexOptions.Singleline).Match(html).Value;
 
             //获取所有图片链接
-            MatchCollection src = new Regex("(?<=src=\").+?[.png|.jpg]*(?=\")", RegexOptions.Singleline).Matches(imageBox);
+            MatchCollection src = new Regex("(?<=src=\").+?(?=\")", RegexOptions.Singleline).Matches(imageBox);
             this.show_message("正在解析章节 " + this.currentChapter + src.Count.ToString() + "/" + num.ToString());
             return src.Count >= num;
         }
