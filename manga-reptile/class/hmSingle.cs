@@ -1,4 +1,5 @@
 ﻿using lkw;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -61,6 +62,7 @@ namespace manga_reptile
         /// <returns></returns>
         public string get_domain()
         {
+            /*
             for (int i = 1; i < 10; i++)
             {
                 string webSiteDomain = $"hm{i.ToString("D2")}.lol";
@@ -70,8 +72,8 @@ namespace manga_reptile
 
                 if (res != "") return webSiteDomain;
             }
-
-            return "";
+            */
+            return "wn02.cc";
         }
 
         protected override ChapterItem get_chapter_images(ChapterItem item)
@@ -330,6 +332,55 @@ namespace manga_reptile
             this.chapters.ForEach((ChapterItem i) => { this.download_chapter_images(i); });
 
             this.show_message("全章节\"" + " 下载完毕");
+        }
+
+        public void get_cover()
+        {
+            string mangaName = this.format_file_name(this.name);
+            if (mangaName == "" || mangaName == null) return;
+            string metaFloder = Path.Combine(global.downloadRoute, this.webSiteName, mangaName + "-smanga-info");
+            if (!Directory.Exists(metaFloder))
+            {
+                Directory.CreateDirectory(metaFloder);
+
+                string coverFile = this.get_first_cover(this.downloadRoute);
+
+                // 复制封面文件到元数据目录
+                if (coverFile != "")
+                {
+                    File.Copy(coverFile, Path.Combine(metaFloder, "cover.jpg"), true);
+                }
+
+                // 写入元数据到json
+                var metaData = new { title = this.get_manga_name("") };
+                string jsonString = JsonConvert.SerializeObject(metaData, Formatting.Indented);
+                File.WriteAllText(Path.Combine(metaFloder, "info.json"), jsonString);
+            }
+        }
+
+        private string get_first_cover(string dir)
+        {
+            string coverFile = "";
+            if (!Directory.Exists(dir)) return coverFile;
+
+            foreach (string fileName in Directory.GetFileSystemEntries(dir))
+            {
+                if (Directory.Exists(fileName))
+                {
+                    coverFile = get_first_cover(Path.Combine(dir,fileName));
+                    if(coverFile != "") return coverFile;
+                }
+
+                if(File.Exists(fileName))
+                {
+                    if (fileName.Contains("cover"))
+                    {
+                        return Path.Combine(dir,fileName);
+                    }
+                }
+            }
+
+            return coverFile;
         }
 
         /// <summary>

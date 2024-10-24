@@ -345,6 +345,7 @@ namespace manga_reptile
         /// <returns></returns>
         protected string format_file_name(string str)
         {
+            if (str == null || str == "") return "";
             //替换关键字
             string[] key = { "\n", "<", ">", "\\", "/", "|", ":", "*", "?", " " };
 

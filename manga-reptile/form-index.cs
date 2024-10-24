@@ -325,7 +325,7 @@ namespace manga_reptile
 
                     jiman.download();
 
-                    jiman.download();
+                    jiman.get_cover();
                 }
 
                 if (task.website == "绅士漫画-仿真下载(hm07.lol)")

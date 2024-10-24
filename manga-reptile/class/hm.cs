@@ -42,6 +42,7 @@ namespace manga_reptile
 
         public string get_domain()
         {
+            /*
             for (int i = 1; i < 10; i++)
             {
                 string webSiteDomain = $"hm{i.ToString("D2")}.lol";
@@ -51,8 +52,8 @@ namespace manga_reptile
 
                 if (res != "") return webSiteDomain;
             }
-
-            return "";
+            */
+            return "wn02.cc";
         }
 
         protected override ChapterItem get_chapter_images(ChapterItem item)

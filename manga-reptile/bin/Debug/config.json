@@ -1,6 +1,7 @@
 {
-  "downloadRoute": "C:\\Program-User\\10temp\\03manga",
-  "subscribeLastRun": "2024-02-14T11:40:19.4508078+08:00",
-  "subscribeEnabeld": false,
-  "subscribeInterval": 12
+  "downloadRoute": "M:\\manga",
+  "subscribeLastRun": "2024-10-24T14:41:28.0113054+08:00",
+  "subscribeEnabeld": true,
+  "subscribeInterval": 12,
+  "textPrefix": "img4.wnimg.ru/data"
 }
