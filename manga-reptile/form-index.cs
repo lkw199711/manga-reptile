@@ -61,6 +61,7 @@ namespace manga_reptile
 
             global.downloadRoute = globalJson.downloadRoute;
             global.subscribeLastRun = globalJson.subscribeLastRun;
+            global.textPrefix = globalJson.textPrefix;
             if (globalJson.subscribeInterval > 0) global.subscribeInterval = globalJson.subscribeInterval;
 
             timerSubscribe.Enabled = globalJson.subscribeEnabeld;
@@ -215,6 +216,7 @@ namespace manga_reptile
             public DateTime subscribeLastRun;
             public bool subscribeEnabeld;
             public int subscribeInterval;
+            public string textPrefix;
 
             public Config(string downloadRoute, DateTime subscribeLastRun, bool subscribeEnabeld = true, int subscribeInterval = 10)
             {
@@ -222,6 +224,7 @@ namespace manga_reptile
                 this.subscribeLastRun = subscribeLastRun;
                 this.subscribeEnabeld = subscribeEnabeld;
                 this.subscribeInterval = subscribeInterval;
+                this.textPrefix = global.textPrefix;
             }   
         }
 
@@ -348,6 +351,9 @@ namespace manga_reptile
 
                 // 任务结束
                 running = false;
+
+                // 重新读取任务列表
+                tasks = task_load();
 
                 // 移除任务
                 tasks.RemoveAt(0);

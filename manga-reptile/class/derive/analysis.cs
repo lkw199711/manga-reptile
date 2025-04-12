@@ -52,7 +52,7 @@ namespace manga_reptile
             //获取漫画名称
             this.name = this.get_manga_name(this.html);
             //构建下载路径
-            this.downloadRoute = route + this.name + "\\";
+            this.downloadRoute = route + this.format_file_name(this.name) + "\\";
             //获取所有页码页面
             this.chapterPages = this.get_chapter_pages(this.html);
             //获取所有章节链接
@@ -168,7 +168,7 @@ namespace manga_reptile
             //图片下载链接
             List<string> images = chapter.images;
             //下载路径
-            string route = this.downloadRoute + chapter.name + "\\";
+            string route = this.downloadRoute + this.format_file_name(chapter.name) + "\\";
             //后缀名
             string suffix = chapter.suffix;
 

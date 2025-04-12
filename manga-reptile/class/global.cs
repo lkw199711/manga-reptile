@@ -14,6 +14,7 @@ namespace manga_reptile
         public static DateTime subscribeLastRun;
         public static bool subscribeEnabeld;
         public static int subscribeInterval = 12;
+        public static string textPrefix = "";
     }
 
     class utils

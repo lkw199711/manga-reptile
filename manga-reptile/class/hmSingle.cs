@@ -171,7 +171,8 @@ namespace manga_reptile
                 string suffix = Path.GetExtension(view);
 
                 // 使用临时前缀
-                if (textPrefix != "") prefix = textPrefix;
+                //if (textPrefix != "") prefix = textPrefix;
+                prefix = global.textPrefix;
 
                 string imgName = new Regex("(?<=name\\stb\">).+?(?=<)").Match(str).Value;
                 string img = "https://" + Regex.Replace(prefix, "^t", "img") + imgTag + imgName + suffix;
