@@ -2,21 +2,10 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Runtime.InteropServices.ComTypes;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Xml;
-using static manga_reptile.FormIndex;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using Formatting = Newtonsoft.Json.Formatting;
 
 namespace manga_reptile
@@ -69,9 +58,9 @@ namespace manga_reptile
             btnTimerStatus.Text = timerSubscribe.Enabled ? "关闭订阅" : "开启订阅";
         }
 
-        public void config_update(string downloadRoute="",DateTime subscribeLastRun=default, bool subscribeEnabeld = true,int subscribeInterval=0)
+        public void config_update(string downloadRoute = "", DateTime subscribeLastRun = default, bool subscribeEnabeld = true, int subscribeInterval = 0)
         {
-            if(downloadRoute == "")
+            if (downloadRoute == "")
             {
                 downloadRoute = global.downloadRoute;
             }
@@ -80,7 +69,7 @@ namespace manga_reptile
                 global.downloadRoute = downloadRoute;
             }
 
-            if(subscribeLastRun == default)
+            if (subscribeLastRun == default)
             {
                 subscribeLastRun = global.subscribeLastRun;
             }
@@ -89,7 +78,7 @@ namespace manga_reptile
                 global.subscribeLastRun = subscribeLastRun;
             }
 
-            if(subscribeInterval == 0)
+            if (subscribeInterval == 0)
             {
                 subscribeInterval = global.subscribeInterval;
             }
@@ -109,7 +98,23 @@ namespace manga_reptile
         /// <param name="e"></param>
         private void buttonTest_Click(object sender, EventArgs e)
         {
-            lkw.msbox(get_domain());
+            //lkw.msbox(get_domain());
+            // 读取 JSON 文件
+            string json = File.ReadAllText("./subscribe.json");
+
+            // 反序列化 JSON 到对象
+            List<TaskParams> taskJson = JsonConvert.DeserializeObject<List<TaskParams>>(json);
+
+            taskJson.ForEach(task =>
+            {
+                task.moveEndSubscribe = true;
+            });
+
+            json = JsonConvert.SerializeObject(taskJson, Formatting.Indented);
+
+            // 将格式化后的 JSON 写入文本文件
+            File.WriteAllText("./subscribe.json", json);
+
         }
 
         public string get_domain()
@@ -153,12 +158,15 @@ namespace manga_reptile
         {
             if (webBrowser1.Document != null)
             {
-                try{
+                try
+                {
                     return webBrowser1.Document.Body.OuterHtml;
-                }catch (Exception ex) {
+                }
+                catch (Exception ex)
+                {
                     return "";
                 }
-                
+
             }
             else
             {
@@ -175,7 +183,8 @@ namespace manga_reptile
 
 
             //新线程下载
-            lkw.NewWork(() => {
+            lkw.NewWork(() =>
+            {
                 jiman = new HMsingle(url, create_params(), this);
                 jiman.download();
 
@@ -192,7 +201,8 @@ namespace manga_reptile
 
 
             //新线程下载
-            lkw.NewWork(() => {
+            lkw.NewWork(() =>
+            {
                 jiujiu = new Jiujiu(url, create_params(), this);
                 jiujiu.download();
 
@@ -225,20 +235,21 @@ namespace manga_reptile
                 this.subscribeEnabeld = subscribeEnabeld;
                 this.subscribeInterval = subscribeInterval;
                 this.textPrefix = global.textPrefix;
-            }   
+            }
         }
 
         public TaskParams create_params()
         {
             return new TaskParams(
                 url: textUrl.Text,
-                title:textMangaName.Text,
-                prefix:textPrefix.Text,
-                website:comWebset.Text,
+                title: textMangaName.Text,
+                prefix: textPrefix.Text,
+                website: comWebset.Text,
                 chapterIncludes: textChapterIncludes.Text,
                 chapterExcludes: textChapterExcludes.Text,
                 imageIncludes: textImageIncludes.Text,
-                imageExcludes: textImageExcludes.Text
+                imageExcludes: textImageExcludes.Text,
+                moveEndSubscribe: moveEnd.Checked
             );
         }
 
@@ -246,7 +257,7 @@ namespace manga_reptile
         {
             public List<TaskParams> tasks;
 
-            public TaskJson( List<TaskParams> tasks)
+            public TaskJson(List<TaskParams> tasks)
             {
                 this.tasks = tasks;
             }
@@ -262,9 +273,10 @@ namespace manga_reptile
             public string chapterExcludes;
             public string imageIncludes;
             public string imageExcludes;
+            public bool moveEndSubscribe;
 
-            public TaskParams(string url, string title, string prefix,string website,string chapterIncludes,string chapterExcludes,
-                string imageIncludes,string imageExcludes)
+            public TaskParams(string url, string title, string prefix, string website, string chapterIncludes, string chapterExcludes,
+                string imageIncludes, string imageExcludes, bool moveEndSubscribe)
             {
                 this.title = title;
                 this.prefix = prefix;
@@ -272,12 +284,14 @@ namespace manga_reptile
                 this.website = website;
                 this.chapterIncludes = chapterIncludes;
                 this.chapterExcludes = chapterExcludes;
-                this.imageIncludes=imageIncludes;
-                this.imageExcludes=imageExcludes;
+                this.imageIncludes = imageIncludes;
+                this.imageExcludes = imageExcludes;
+                this.moveEndSubscribe = moveEndSubscribe;
             }
         }
 
-        public List<TaskParams> task_load() {
+        public List<TaskParams> task_load()
+        {
             // 读取 JSON 文件
             string json = File.ReadAllText("./task.json");
 
@@ -287,7 +301,8 @@ namespace manga_reptile
             return taskJson;
         }
 
-        public void task_add(TaskParams task=null,List<TaskParams> taskArr=null) {
+        public void task_add(TaskParams task = null, List<TaskParams> taskArr = null)
+        {
             // 读取 JSON 文件
             string json = File.ReadAllText("./task.json");
 
@@ -295,7 +310,7 @@ namespace manga_reptile
             List<TaskParams> taskJson = JsonConvert.DeserializeObject<List<TaskParams>>(json);
 
 
-            if (taskArr!=null) taskJson.AddRange(taskArr);
+            if (taskArr != null) taskJson.AddRange(taskArr);
 
             task = task == null ? create_params() : task;
             // 添加任务
@@ -329,6 +344,15 @@ namespace manga_reptile
                     jiman.download();
 
                     jiman.get_cover();
+
+                    jiman.move_file(task.moveEndSubscribe);
+
+                    if (task.moveEndSubscribe && jiman.isEnd)
+                    {
+                        subscribe_remove(task.url);
+
+                        write_log($"[moveEnd]漫画{task.title} 已完结,转移文件至完结文件夹并删除订阅!");
+                    }
                 }
 
                 if (task.website == "绅士漫画-仿真下载(hm07.lol)")
@@ -374,7 +398,8 @@ namespace manga_reptile
             File.WriteAllText("./task.json", json);
         }
 
-        public void subscribe_add(TaskParams task) {
+        public void subscribe_add(TaskParams task)
+        {
             string json;
             List<TaskParams> taskJson = new List<TaskParams>();
 
@@ -386,9 +411,10 @@ namespace manga_reptile
                 // 反序列化 JSON 到对象
                 taskJson = JsonConvert.DeserializeObject<List<TaskParams>>(json);
 
-                foreach(TaskParams item in taskJson)
+                foreach (TaskParams item in taskJson)
                 {
-                    if (item.url == task.url) {
+                    if (item.url == task.url)
+                    {
                         lkw.msbox("此订阅已添加,请查看订阅文件.");
                         return;
                     }
@@ -404,6 +430,27 @@ namespace manga_reptile
 
             // 添加订阅之后立即执行一次
             task_add(task);
+        }
+
+        public void subscribe_remove(string url)
+        {
+            string json;
+            List<TaskParams> taskJson = new List<TaskParams>();
+
+            // 读取 JSON 文件
+            json = File.ReadAllText("./subscribe.json");
+
+            // 反序列化 JSON 到对象
+            taskJson = JsonConvert.DeserializeObject<List<TaskParams>>(json);
+
+            foreach (TaskParams item in taskJson)
+            {
+                if (item.url == url)
+                {
+                    taskJson.Remove(item);
+                    return;
+                }
+            }
         }
 
         public void subscribe_run()
@@ -425,7 +472,7 @@ namespace manga_reptile
 
             task_add(taskArr: taskJson);
 
-            config_update(subscribeLastRun: now, subscribeEnabeld:timerSubscribe.Enabled);
+            config_update(subscribeLastRun: now, subscribeEnabeld: timerSubscribe.Enabled);
         }
 
         private void timerSubscribe_Tick(object sender, EventArgs e)
@@ -437,12 +484,26 @@ namespace manga_reptile
         {
             subscribe_add(create_params());
         }
-        public void write_log(string msg)
+        protected void write_log(string msg)
         {
             msg = DateTime.Now.ToString() + " " + msg;
 
             Console.WriteLine(msg);
-            lkw.WriteLine("./log.txt", msg);
+
+            // 获取当前日期
+            DateTime currentDate = DateTime.Now;
+
+            // 构建目录路径
+            string directoryPath = Path.Combine("./log/", currentDate.Year.ToString(), currentDate.Month.ToString("D2"));
+
+            if (!Directory.Exists(directoryPath))
+            {
+                // 创建嵌套目录
+                Directory.CreateDirectory(directoryPath);
+                Console.WriteLine($"已创建目录：{directoryPath}");
+            }
+
+            lkw.WriteLine($"{directoryPath}/{currentDate.Day.ToString("D2")}.txt", msg);
         }
 
         private void btnTimerStatus_Click(object sender, EventArgs e)
@@ -451,7 +512,7 @@ namespace manga_reptile
 
             config_update(subscribeEnabeld: timerSubscribe.Enabled);
 
-            if(timerSubscribe.Enabled)
+            if (timerSubscribe.Enabled)
             {
                 labelMessage.Text = "已开启订阅事件";
                 btnTimerStatus.Text = "关闭订阅";
@@ -549,4 +610,4 @@ namespace manga_reptile
     }
 }
 
-    
+

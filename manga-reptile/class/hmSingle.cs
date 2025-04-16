@@ -3,12 +3,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.Xml.Linq;
 using static manga_reptile.FormIndex;
 
 namespace manga_reptile
@@ -23,6 +18,8 @@ namespace manga_reptile
         private string targetDomain = "";
 
         string currentChapter = "";
+
+        public bool isEnd = false;
         /// <summary>
         /// 初始化方法
         /// </summary>
@@ -83,7 +80,7 @@ namespace manga_reptile
             this.show_message("正在获取章节\"" + item.name + " 图片.");
             this.currentChapter = item.name;
 
-            string html = this.get_browser_html(item.url,item.imageNum,0);
+            string html = this.get_browser_html(item.url, item.imageNum, 0);
             //string html = this.get_html_by_request(item.url);
 
             //添加第一页
@@ -103,7 +100,7 @@ namespace manga_reptile
             }
 
 
-            
+
 
             //获取页码链接
             MatchCollection src = new Regex("(?<=href=\").+?(?=\")", RegexOptions.Singleline).Matches(pageBox);
@@ -111,7 +108,7 @@ namespace manga_reptile
             foreach (Match m in src)
             {
                 if (m.Value == "/themes/weitu/images/bg/shoucang.jpg") continue;
-                string page = "https://" + this.webSiteDomain+ m.Value;
+                string page = "https://" + this.webSiteDomain + m.Value;
 
                 string html2 = this.get_browser_html(page, item.imageNum, list.Count);
                 var listTwo = get_subpage_images(html2);
@@ -125,13 +122,13 @@ namespace manga_reptile
             return item;
         }
 
-        protected List<string> get_nextpage_images(string html,int imageNum, List<string> list)
+        protected List<string> get_nextpage_images(string html, int imageNum, List<string> list)
         {
             //截取页码部分
             string pageBox = new Regex("(?<=paginator).+?(?=f_right)", RegexOptions.Singleline).Match(html).Value;
 
             string nextPage = new Regex("(?<=next\"><a\\shref=\").+?(?=\">後頁)", RegexOptions.Singleline).Match(pageBox).Value;
-            
+
             if (nextPage != "")
             {
                 string page = "https://" + this.webSiteDomain + nextPage;
@@ -139,7 +136,7 @@ namespace manga_reptile
 
                 list.AddRange(get_subpage_images(html2));
 
-                if(new Regex("(?<=href=\").+?(?=\">後頁)", RegexOptions.Singleline).Match(html2).Value != "")
+                if (new Regex("(?<=href=\").+?(?=\">後頁)", RegexOptions.Singleline).Match(html2).Value != "")
                 {
                     return get_nextpage_images(html2, imageNum, list);
                 }
@@ -149,7 +146,8 @@ namespace manga_reptile
 
             return list;
         }
-        protected List<string> get_subpage_images(string html) { 
+        protected List<string> get_subpage_images(string html)
+        {
             List<string> list = new List<string>();
 
             // 获取图片链接临时前缀
@@ -181,7 +179,7 @@ namespace manga_reptile
             }
 
             return list;
-        
+
         }
 
         /// <summary>
@@ -200,7 +198,7 @@ namespace manga_reptile
 
             string pageBox = new Regex("(?<=thispage).+?(?=/div)", RegexOptions.Singleline).Match(html).Value;
 
-            if(pageBox=="") return list;
+            if (pageBox == "") return list;
 
             MatchCollection pages = new Regex("(?<=href=\").+?(?=\")", RegexOptions.Singleline).Matches(pageBox);
 
@@ -236,7 +234,7 @@ namespace manga_reptile
             {
                 //章节内容
                 string str = chapterList[i].Value;
-                
+
                 //章节链接
                 string href = new Regex("/photos-index-aid-[\\d]+.html").Match(str).Value;
                 //章节名
@@ -250,13 +248,13 @@ namespace manga_reptile
                     lkw.log("存在 跳过" + name);
                     continue;
                 }
-                
+
                 // 正则排除章节
                 string chapterExcludes = this.taskParams.chapterExcludes;
 
                 if (chapterExcludes != "" && new Regex(chapterExcludes).IsMatch(name))
                 {
-                    lkw.log("跳过"+ name);
+                    lkw.log("跳过" + name);
                     continue;
                 }
 
@@ -285,7 +283,7 @@ namespace manga_reptile
             FormIndex.set_label_text(this.form.labelMessage, msg);
         }
 
-        public string get_browser_html(string url,int imageNum, int baseNum)
+        public string get_browser_html(string url, int imageNum, int baseNum)
         {
             this.form.webBrowser1.Navigate(url);
             string html = "";
@@ -298,7 +296,8 @@ namespace manga_reptile
                     html = this.form.GetWebPageHtml();
                 }));
 
-                if (html.Length > 1000 && check_html_ready(html, imageNum, baseNum) && html.Length==oldHtml.Length) {
+                if (html.Length > 1000 && check_html_ready(html, imageNum, baseNum) && html.Length == oldHtml.Length)
+                {
                     this.form.webBrowser1.Navigate("about:blank");
                     return html;
                 }
@@ -318,15 +317,15 @@ namespace manga_reptile
                 oldHtml = html;
             }
         }
-        public bool check_html_ready(string html,int num,int baseNum)
+        public bool check_html_ready(string html, int num, int baseNum)
         {
             //截取图片链接部分
             string imageBox = new Regex("(?<=gallary_wrap).+?(?=comment_wrap)", RegexOptions.Singleline).Match(html).Value;
 
             //获取所有图片链接
             MatchCollection src = new Regex("(?<=src=\").+?(?=\")", RegexOptions.Singleline).Matches(imageBox);
-            this.show_message("正在解析章节 " + this.currentChapter  + (src.Count + baseNum).ToString() + "/" + num.ToString());
-            return src.Count+ baseNum >= num || src.Count>=12;
+            this.show_message("正在解析章节 " + this.currentChapter + (src.Count + baseNum).ToString() + "/" + num.ToString());
+            return src.Count + baseNum >= num || src.Count >= 12;
         }
         public new void download()
         {
@@ -359,6 +358,68 @@ namespace manga_reptile
             }
         }
 
+        public void move_file(bool moveEndSubscribe)
+        {
+            if (!moveEndSubscribe) return;
+
+            this.chapters.ForEach(chapter =>
+            {
+                if (chapter.name.Contains("[完结]"))
+                {
+                    this.isEnd = true;
+                }
+                if (chapter.name.Contains("[完結]"))
+                {
+                    this.isEnd = true;
+                }
+            });
+
+            if (!this.isEnd) return;
+
+            string mangaName = this.format_file_name(this.name);
+            if (mangaName == "" || mangaName == null) return;
+            string mangaFloder = Path.Combine(global.downloadRoute, this.webSiteName, mangaName);
+            string metaFloder = Path.Combine(global.downloadRoute, this.webSiteName, mangaName + "-smanga-info");
+
+            string endFloder = "";
+            if (this.chapters.Count == 1)
+            {
+                endFloder = Path.Combine(global.downloadRoute, this.webSiteName + "-单话完结");
+            }
+            else
+            {
+                endFloder = Path.Combine(global.downloadRoute, this.webSiteName + "-完结待处理");
+            }
+
+            if (!Directory.Exists(endFloder)) Directory.CreateDirectory(endFloder);
+            if (Directory.Exists(mangaFloder))
+            {
+                string newMangaFloder = Path.Combine(endFloder, mangaName);
+                if (Directory.Exists(newMangaFloder))
+                {
+                    write_log($"[moveEnd]尝试转移完结漫画,但因完结目录中已存在同名文件,移动失败!");
+                }
+                else
+                {
+                    Directory.Move(mangaFloder, newMangaFloder);
+                }
+
+            }
+            if (!Directory.Exists(metaFloder))
+            {
+                string newMetaFloder = Path.Combine(endFloder, mangaName + "-smanga-info");
+                if (File.Exists(newMetaFloder))
+                {
+                    write_log($"[moveEnd]尝试转移完结漫画元数据,但因完结目录中已存在同名文件,移动失败!");
+                }
+                else
+                {
+                    Directory.Move(metaFloder, newMetaFloder);
+                }
+
+            }
+        }
+
         private string get_first_cover(string dir)
         {
             string coverFile = "";
@@ -368,15 +429,15 @@ namespace manga_reptile
             {
                 if (Directory.Exists(fileName))
                 {
-                    coverFile = get_first_cover(Path.Combine(dir,fileName));
-                    if(coverFile != "") return coverFile;
+                    coverFile = get_first_cover(Path.Combine(dir, fileName));
+                    if (coverFile != "") return coverFile;
                 }
 
-                if(File.Exists(fileName))
+                if (File.Exists(fileName))
                 {
                     if (fileName.Contains("cover"))
                     {
-                        return Path.Combine(dir,fileName);
+                        return Path.Combine(dir, fileName);
                     }
                 }
             }
@@ -402,7 +463,7 @@ namespace manga_reptile
             for (int i = 0, l = images.Count; i < l; i++)
             {
                 //输出提示信息
-                this.show_message("正在下载章节\"" + chapter.name + "+\"" + "第" + (i.ToString()+"/"+ images.Count.ToString()) + "张图片.");
+                this.show_message("正在下载章节\"" + chapter.name + "+\"" + "第" + (i.ToString() + "/" + images.Count.ToString()) + "张图片.");
 
                 string saveName = route + Path.GetFileName(images[i]);
 

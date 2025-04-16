@@ -53,12 +53,13 @@
             this.labelChapterExcludes = new System.Windows.Forms.Label();
             this.labelChapterIncludes = new System.Windows.Forms.Label();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.btnHand = new System.Windows.Forms.Button();
             this.btnTimerStatus = new System.Windows.Forms.Button();
             this.btnSubscribe = new System.Windows.Forms.Button();
             this.btnAddTask = new System.Windows.Forms.Button();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.timerSubscribe = new System.Windows.Forms.Timer(this.components);
-            this.btnHand = new System.Windows.Forms.Button();
+            this.moveEnd = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.bindingSource1)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -285,6 +286,16 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "操作按钮";
             // 
+            // btnHand
+            // 
+            this.btnHand.Location = new System.Drawing.Point(311, 61);
+            this.btnHand.Name = "btnHand";
+            this.btnHand.Size = new System.Drawing.Size(125, 23);
+            this.btnHand.TabIndex = 18;
+            this.btnHand.Text = "手动执行一次订阅";
+            this.btnHand.UseVisualStyleBackColor = true;
+            this.btnHand.Click += new System.EventHandler(this.btnHand_Click);
+            // 
             // btnTimerStatus
             // 
             this.btnTimerStatus.Location = new System.Drawing.Point(207, 61);
@@ -317,6 +328,7 @@
             // 
             // groupBox4
             // 
+            this.groupBox4.Controls.Add(this.moveEnd);
             this.groupBox4.Controls.Add(this.comWebset);
             this.groupBox4.Location = new System.Drawing.Point(22, 132);
             this.groupBox4.Name = "groupBox4";
@@ -330,15 +342,17 @@
             this.timerSubscribe.Interval = 10000;
             this.timerSubscribe.Tick += new System.EventHandler(this.timerSubscribe_Tick);
             // 
-            // btnHand
+            // moveEnd
             // 
-            this.btnHand.Location = new System.Drawing.Point(311, 61);
-            this.btnHand.Name = "btnHand";
-            this.btnHand.Size = new System.Drawing.Size(125, 23);
-            this.btnHand.TabIndex = 18;
-            this.btnHand.Text = "手动执行一次订阅";
-            this.btnHand.UseVisualStyleBackColor = true;
-            this.btnHand.Click += new System.EventHandler(this.btnHand_Click);
+            this.moveEnd.AutoSize = true;
+            this.moveEnd.Checked = true;
+            this.moveEnd.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.moveEnd.Location = new System.Drawing.Point(14, 46);
+            this.moveEnd.Name = "moveEnd";
+            this.moveEnd.Size = new System.Drawing.Size(96, 16);
+            this.moveEnd.TabIndex = 20;
+            this.moveEnd.Text = "转移完结漫画";
+            this.moveEnd.UseVisualStyleBackColor = true;
             // 
             // FormIndex
             // 
@@ -361,6 +375,7 @@
             this.groupBox2.PerformLayout();
             this.groupBox3.ResumeLayout(false);
             this.groupBox4.ResumeLayout(false);
+            this.groupBox4.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -398,6 +413,7 @@
         private System.Windows.Forms.Timer timerSubscribe;
         private System.Windows.Forms.Button btnTimerStatus;
         private System.Windows.Forms.Button btnHand;
+        private System.Windows.Forms.CheckBox moveEnd;
     }
 }
 
